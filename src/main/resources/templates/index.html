@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Поиск авиабилеты</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif; /* Новый шрифт */
+            background-color: #E6D7FF; /* Светло-фиолетовый фон */
+            color: #4B0082; /* Темно-фиолетовый текст для контраста */
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        header {
+            padding: 20px 20px; /* Уменьшение отступов */
+            text-align: center;
+            background: #5C4B8C; /* Светло-фиолетовый фон для заголовка */
+            color: #ffffff; /* Белый цвет текста */
+            font-family: 'Roboto', sans-serif; /* Шрифт Roboto */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 100;
+            margin-top: 0;
+        }
+
+        header h1 {
+            font-family: 'Roboto', sans-serif; /* Шрифт Roboto */
+            font-size: 3rem; /* Размер шрифта */
+            margin-bottom: 10px;
+            margin-top: 0;
+            color: #ffffff; /* Белый цвет текста для контраста */
+        }
+
+        .card-container {
+            width: 100%; /* Ширина 100%, но карточка будет центрирована */
+            display: flex;
+            justify-content: center; /* Центрируем контейнер по горизонтали */
+            align-items: center; /* Центрируем контейнер по вертикали */
+            padding: 20px; /* Добавим немного отступов вокруг */
+        }
+
+        header p {
+            font-family: 'Roboto', sans-serif; /* Шрифт Roboto */
+            font-size: 1.2rem; /* Размер шрифта */
+            margin-bottom: 1.5rem; /* Отступ снизу */
+            margin-top: 0; /* Отсутствие отступа сверху */
+            color: #ffffff; /* Белый цвет текста для контраста */
+        }
+
+
+        .card {
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff; /* Белый фон для карточек */
+            border: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 15px; /* Скругленные углы */
+        }
+
+        .card:hover {
+            transform: translateY(-5px); /* Легкое поднимание карточки при наведении */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); /* Тень для выделения */
+        }
+
+        footer {
+            background-color: #5C4B8C; /* Светло-фиолетовый фон для подвала */
+            color: white; /* Белый текст для контраста */
+            padding: 20px 0;
+            text-align: center;
+            width: 100%;
+            position: relative;
+            z-index: 100;
+            margin-top: auto
+            font-family: 'Roboto', sans-serif; /* Шрифт Roboto */
+        }
+
+
+        .table th {
+            background-color: #5C4B8C; /* Светло-фиолетовый фон для заголовков таблицы */
+            color: #fff; /* Белый цвет текста */
+        }
+
+        .table td {
+            background-color: #ffffff; /* Белый фон для ячеек таблицы */
+            color: #333; /* Темный текст для контраста */
+        }
+
+        .btn-primary {
+            background-color: #5C4B8C; /* Светло-фиолетовый цвет для кнопки */
+            border: none;
+            color: white; /* Белый текст на кнопке */
+        }
+
+        .btn-primary:hover {
+            background-color: #7A5C9D; /* Более светлый фиолетовый при наведении */
+        }
+
+        .btn-primary:active {
+            transform: none; /* Убираем эффект уменьшения при нажатии */
+        }
+
+
+        .modal-header, .modal-body {
+            background-color: #ffffff; /* Белый фон */
+            color: #333; /* Темный текст для хорошей читаемости */
+            font-family: 'Roboto', sans-serif; /* Шрифт Roboto для согласованности */
+        }
+
+        .modal-footer {
+            background-color: #E6D7FF; /* Светло-фиолетовый фон для подвала модального окна */
+            color: #333; /* Темный текст для контраста */
+        }
+
+
+        .rounded-button {
+            border-radius: 30px; /* Скругленные углы кнопки */
+            padding: 10px 20px; /* Отступы внутри кнопки */
+            background-color: #5C4B8C; /* Светло-фиолетовый фон для кнопки */
+            color: white; /* Белый текст на кнопке */
+            border: none; /* Без рамки */
+            font-family: 'Roboto', sans-serif; /* Шрифт Roboto */
+            transition: background-color 0.3s ease; /* Плавный переход для изменения цвета */
+        }
+
+        .rounded-button:hover {
+            background-color: #7A5C9D; /* Светлый фиолетовый при наведении */
+        }
+
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            color: #5C4B8C; /* Цвет текста для заголовков секций */
+            font-family: 'Roboto', sans-serif; /* Шрифт Roboto */
+        }
+
+        .chart-container {
+            margin: 40px 0;
+        }
+
+
+        /* Общий контейнер для меню и навигационного бара */
+        .header-nav-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 0;
+            background-color: #5C4B8C; /* Светло-фиолетовый фон для контейнера */
+            padding: 10px 0; /* Немного отступов сверху и снизу */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Легкая тень для выделения */
+        }
+
+
+        /* Навигационное меню */
+        .nav {
+            background-color: #5C4B8C; /* Светло-фиолетовый фон для меню */
+            color: #fff; /* Белый цвет текста */
+            padding: 5px 0; /* Уменьшение отступов */
+            display: flex;
+            justify-content: center; /* Центрирование ссылок */
+            gap: 30px; /* Расстояние между ссылками */
+            z-index: 1000; /* Поверх других элементов */
+            border-bottom: none;
+        }
+
+        /* Ссылки в навигации */
+        .nav-link {
+            color: #fff;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            transition: color 0.3s ease; /* Плавный переход для изменения цвета */
+        }
+
+        .nav-link:hover {
+            color: #9381C6; /* Цвет ссылки при наведении */
+        }
+
+        .nav-link.active {
+            color: #ffffff !important; /* Белый цвет для активной ссылки */
+            font-weight: bold;
+        }
+
+
+        /* Верхний навигационный бар */
+        .auth-bar {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 1100; /* Слой выше меню */
+            border: none;
+            font-family: 'Roboto', sans-serif; /* Шрифт Roboto для согласованности */
+        }
+
+        .auth-buttons {
+            display: flex;
+            flex-direction: row; /* Кнопки по вертикали */
+            gap: 10px;
+        }
+
+        /* Кнопки входа и регистрации */
+        .auth-button {
+            background-color: #5C4B8C; /* Светло-фиолетовый фон для кнопок */
+            color: white; /* Белый текст */
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px; /* Скругленные углы */
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease; /* Плавный переход для изменения цвета */
+        }
+
+        .auth-button:hover {
+            background-color: #7A5C9D; /* Светлый фиолетовый при наведении */
+        }
+
+        .auth-button:active {
+            background-color: #4B3F68; /* Темный фиолетовый при нажатии */
+        }
+
+
+        /* Кнопки входа и регистрации */
+        .btn-primary {
+            background-color: #5C4B8C; /* Светло-фиолетовый цвет фона */
+            border: none;
+            padding: 8px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            color: white; /* Белый текст на кнопке */
+            transition: background-color 0.3s ease, color 0.3s ease; /* Плавный переход для изменения цвета фона и текста */
+        }
+
+        .btn-primary:hover {
+            background-color: #7A5C9D; /* Светлый фиолетовый при наведении */
+            color: #9381C6; /* Цвет текста при наведении */
+        }
+
+        .btn-primary:active {
+            transform: none; /* Убираем эффект уменьшения при нажатии */
+            color: #ffffff; /* Белый текст при нажатии */
+        }
+
+
+
+
+
+        /* Стили для имени пользователя */
+        .username {
+            background-color: #5C4B8C; /* Светло-фиолетовый для кнопки */
+            border: none;
+            padding: 5px 15px;
+            font-size: 14px; /* Размер шрифта как у кнопки выхода */
+            border-radius: 5px; /* Скругление углов */
+            color: white; /* Белый текст */
+            font-weight: 600; /* Жирное начертание */
+            text-align: center; /* Центрирование текста */
+            transition: background-color 0.3s ease, color 0.3s ease; /* Плавный переход для фона и текста */
+            text-decoration: none; /* Убираем подчеркивание, если ссылка */
+        }
+
+        .username:hover {
+            color: #9381C6; /* Цвет ссылки при наведении */
+        }
+
+        .username.active {
+            color: #ffffff !important; /* Белый цвет для активной ссылки */
+            font-weight: bold;
+        }
+
+        /* Стили для кнопки выхода */
+        .btn-danger {
+            background-color: #5C4B8C; /* Светло-фиолетовый для кнопки выхода */
+            border: none;
+            padding: 5px 15px;
+            font-size: 14px;
+            border-radius: 5px;
+            color: white; /* Белый текст на кнопке */
+            transition: background-color 0.3s ease; /* Плавный переход для изменения цвета фона */
+        }
+
+        .btn-danger:hover {
+            color: #9381C6; /* Цвет ссылки при наведении */
+        }
+
+        .btn-danger.active {
+            color: #ffffff !important; /* Белый цвет для активной ссылки */
+            font-weight: bold;
+        }
+
+        .btn-custom {
+            background-color: #5c4b8c;
+            color: white;
+            border-radius: 30px;
+            font-size: 14px;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            background-color: #4a3a6a;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            transform: scale(1.05);
+        }
+
+        .rounded-button {
+            border-radius: 30px;
+        }
+
+
+        .modal-header {
+            background-color: #5C4B8C; /* Светло-фиолетовый цвет фона */
+            color: white;
+            display: flex;
+            justify-content: center; /* Центрирование содержимого по горизонтали */
+            position: relative;
+        }
+
+        .modal-header .btn-close {
+            position: absolute;
+            right: 1rem; /* Размещение кнопки закрытия справа */
+            filter: invert(100%); /* Делает иконку белой */
+            background-color: rgba(255, 255, 255, 0.3); /* Белый фон с прозрачностью */
+            border: 1px solid white; /* Белая рамка для видимости */
+            border-radius: 50%; /* Круглая форма кнопки */
+            transition: background-color 0.3s ease; /* Плавный переход для изменения фона */
+        }
+
+        .modal-header .btn-close:hover {
+            background-color: rgba(255, 255, 255, 0.6); /* Слегка затемненный фон при наведении */
+        }
+
+        .popular-courses-title {
+            font-family: "Times New Roman", Times, serif;
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #5C4B8C; /* Светло-фиолетовый цвет для заголовка */
+            border-bottom: 3px solid #7A5C9D; /* Нижняя граница в более светлый фиолетовый цвет */
+            display: inline-block;
+            padding-bottom: 5px;
+            transition: border-color 0.3s ease; /* Плавный переход для цвета границы */
+        }
+
+        .popular-courses-title:hover {
+            border-bottom-color: #5C4B8C; /* Темно-фиолетовая граница при наведении */
+        }
+
+        /* Для анимации */
+        .fade-in {
+            animation: fadeIn 2s ease-out; /* Плавная анимация появления */
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0; /* Начальная прозрачность */
+                transform: translateY(20px); /* Смещение по оси Y */
+                color: #5C4B8C; /* Светло-фиолетовый цвет на старте */
+            }
+            100% {
+                opacity: 1; /* Окончательная непрозрачность */
+                transform: translateY(0); /* Элемент приходит в исходное положение */
+                color: #111; /* Темный цвет текста по завершению */
+            }
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* отступ между элементами */
+        }
+
+        .user-info .nav-link {
+            font-weight: bold;
+            text-decoration: none;
+            color: #333;
+        }
+
+
+
+        /* Для изображений */
+        .img-fluid {
+            border-radius: 10px; /* Скругленные углы для плавного вида */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Легкая тень для объемности */
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Плавный переход для увеличения и тени */
+        }
+
+        .img-fluid:hover {
+            transform: scale(1.05); /* Легкое увеличение изображения при наведении */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); /* Увеличенная тень при наведении */
+        }
+
+        .carousel-item img {
+            max-height: 400px; /* Максимальная высота изображения */
+            object-fit: cover; /* Заполнение изображения, сохраняя пропорции */
+            border-radius: 10px; /* Скругленные углы для плавного вида */
+        }
+
+
+        /* Новый стиль для секций с креативными изображениями */
+        .feature-section {
+            background-color: #ffffff; /* Белый фон для секции */
+            padding: 50px 20px;
+            margin-top: 50px;
+            border-radius: 15px; /* Скругленные углы */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Легкая тень */
+        }
+
+        .feature-section h2 {
+            font-size: 2.5rem; /* Размер шрифта для заголовка */
+            color: #5C4B8C; /* Светло-фиолетовый цвет текста */
+            text-align: center; /* Центрирование текста */
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .feature-section p {
+            font-size: 1.2rem; /* Размер шрифта для текста */
+            color: #555; /* Темно-серый текст */
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .feature-section .row {
+            display: flex;
+            justify-content: space-around; /* Расположение элементов по горизонтали */
+        }
+
+        .feature-item {
+            text-align: center; /* Центрирование содержимого */
+            max-width: 300px;
+            margin: 0 10px;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease; /* Плавный переход для увеличения и тени */
+        }
+
+        .feature-item img {
+            width: 100%; /* Ширина изображения 100% от родительского контейнера */
+            height: 200px; /* Фиксированная высота изображения */
+            object-fit: cover; /* Сохранение пропорций изображения */
+            border-radius: 10px; /* Скругленные углы изображения */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Легкая тень */
+        }
+
+        .feature-item h4 {
+            font-size: 1.5rem; /* Размер шрифта для заголовка */
+            color: #5C4B8C; /* Светло-фиолетовый цвет текста */
+            margin-top: 15px;
+        }
+
+        .feature-item p {
+            font-size: 1rem;
+            color: #777; /* Серый цвет для текста */
+            margin-top: 10px;
+        }
+
+        .feature-item:hover {
+            transform: scale(1.05); /* Легкое увеличение при наведении */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); /* Усиленная тень */
+        }
+
+        .feature-item:hover h4 {
+            color: #7A5C9D; /* Цвет заголовка при наведении */
+        }
+
+        .feature-item:hover p {
+            color: #555; /* Более темный цвет для текста при наведении */
+        }
+
+        /* Дополнительные стили для кнопок */
+        .btn-cta {
+            background-color: #5C4B8C; /* Светло-фиолетовый цвет фона */
+            color: #fff; /* Белый цвет текста */
+            padding: 15px 30px; /* Отступы для кнопки */
+            font-size: 1.2rem; /* Размер шрифта */
+            font-weight: 600; /* Жирное начертание */
+            text-decoration: none; /* Без подчеркивания */
+            border-radius: 30px; /* Скругленные углы */
+            display: inline-block; /* Для работы с отступами */
+            margin-top: 30px; /* Отступ сверху */
+            transition: background-color 0.3s ease, transform 0.3s ease; /* Плавный переход для фона и масштаба */
+        }
+
+        .btn-cta:hover {
+            background-color: #7A5C9D; /* Светлый фиолетовый при наведении */
+            transform: scale(1.05); /* Увеличение при наведении */
+        }
+
+        .btn-cta:active {
+            transform: scale(1); /* Убираем эффект увеличения при нажатии */
+        }
+
+
+        /* Стили для карусели */
+        .carousel {
+            margin-top: 50px; /* Отступ сверху */
+        }
+
+        .carousel-item {
+            position: relative; /* Позиционирование для вложенных элементов */
+        }
+
+        .carousel-caption {
+            position: absolute;
+            top: 50%; /* Центрирование по вертикали */
+            left: 50%; /* Центрирование по горизонтали */
+            transform: translate(-50%, -50%); /* Совмещение с центром */
+            background-color: rgba(0, 0, 0, 0.5); /* Прозрачный черный фон для текста */
+            color: #fff; /* Белый цвет для текста */
+            padding: 10px 20px; /* Отступы для текста */
+            border-radius: 5px; /* Скругленные углы */
+            font-size: 1.2rem; /* Размер шрифта для заголовка */
+            text-align: center; /* Центрирование текста */
+            transition: transform 0.3s ease-in-out; /* Плавный переход для изменения трансформации */
+        }
+
+        .carousel-caption:hover {
+            transform: translate(-50%, -50%) scale(1.1); /* Легкое увеличение при наведении */
+        }
+
+        .carousel-item img {
+            width: 100%; /* Ширина изображения на 100% */
+            object-fit: cover; /* Обеспечивает, чтобы изображение не теряло свою форму */
+            height: 100%; /* Подгонка по высоте */
+            border-radius: 15px; /* Скругленные углы для изображений */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Легкая тень для изображения */
+        }
+
+
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-nav-container">
+        <!-- Навигационное меню -->
+        <nav class="nav">
+            <a class="nav-link" href="/">Главная страница</a>
+            <a class="nav-link" href="/toabout">Об авторе</a>
+            <a th:if="${isAdmin == true}" class="nav-link" href="/blog/admin">Панель администратора</a> <!-- Ссылка на административную панель -->
+        </nav>
+
+
+        <!-- Верхний навигационный бар -->
+        <div class="auth-bar">
+            <!-- Проверка авторизации пользователя -->
+            <div th:if="${user == null}">
+                <!-- Кнопки входа и регистрации -->
+                <div class="auth-buttons">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loginModal">
+                        Вход
+                    </button>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal">
+                        Регистрация
+                    </button>
+                </div>
+            </div>
+
+            <div th:if="${user != null}" class="user-info" style="display: flex; align-items: center; gap: 10px;">
+                <!-- Ссылка на профиль пользователя с применением стиля nav-link -->
+                <a th:href="@{/profile/{id}(id=${user.id})}" th:text="${user.username}" class="username"></a>
+                <!-- Кнопка выхода -->
+                <a href="/logout" class="btn btn-danger">Выйти</a>
+            </div>
+        </div>
+    </div>
+    <h1>Поиск авиабилетов</h1>
+    <p>Поиск дешёвых авиабилетов</p>
+</header>
+
+<div class="card p-4" style="width: 100%; max-width: 100%; border-radius: 10px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); margin: 0;">
+    <form th:action="@{/}" method="get" class="mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center" style="gap: 15px;"> <!-- Поисковая строка с кнопками -->
+            <div class="d-flex align-items-center" style="gap: 10px; width: 100%;">
+                <!-- Поле ввода -->
+                <input type="text" name="keyword" class="form-control" placeholder="Введите название города или любой другой параметр" th:value="${keyword}" required
+                       style="font-size: 14px; padding: 8px 12px; border-radius: 5px; flex-grow: 1; max-width: calc(100% - 140px); background-color: #f9f9f9; color: #333; border: 1px solid #ddd;" />
+
+                <!-- Кнопка поиска -->
+                <button class="btn btn-light" type="submit" style="font-size: 14px; padding: 8px 15px; border-radius: 5px; background-color: #7A5C9D; color: white; border: 1px solid #7A5C9D; transition: background-color 0.3s;">Поиск</button>
+
+                <!-- Кнопка очистки -->
+                <button type="button" class="btn btn-light" onclick="clearSearch()" style="font-size: 14px; padding: 8px 15px; border-radius: 5px; background-color: #f5f5f5; color: #333; border: 1px solid #ddd;">Очистить</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Количество рейсов -->
+    <h4 style="font-size: 24px; color: #7A5C9D; text-align: center; margin-top: 0;">
+        Количество рейсов: <span id="CargoCount" th:text="${#lists.size(listCargos)}" style="font-weight: 500; color: #7a5c9d;">0</span>
+    </h4>
+</div>
+
+
+<div class="card p-4" style="border-radius: 12px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); background-color: #fff;">
+    <h4 style="font-size: 24px; font-weight: 600; color: #7A5C9D; text-align: center; margin-bottom: 20px;">
+        Список рейсов
+    </h4>
+    <div class="table-responsive">
+        <table class="table" style="border-radius: 10px; overflow: hidden; border: 1px solid #ddd;">
+            <thead>
+            <tr>
+                <th style="background-color: #7A5C9D; color: #fff;">ID</th>
+                <th style="background-color: #7A5C9D; color: #fff;">Название рейса</th>
+                <th style="background-color: #7A5C9D; color: #fff;">Название самолёта</th>
+                <th style="background-color: #7A5C9D; color: #fff;">Город отправки</th>
+                <th style="background-color: #7A5C9D; color: #fff;">Дата отправки</th>
+                <th style="background-color: #7A5C9D; color: #fff;">Город прибытия</th>
+                <th style="background-color: #7A5C9D; color: #fff;">Дата прибытия</th>
+                <th style="background-color: #7A5C9D; color: #fff;">Действия</th>
+            </tr>
+            </thead>
+            <tbody id="cargoTable">
+            <tr th:each="cargo : ${listCargos}">
+                <td th:text="${cargo.id}">ID отсутствует</td>
+                <td th:text="${cargo.cargoName}">Название рейса отсутствует</td>
+                <td th:text="${cargo.cargoContent}">Содержимое рейса отсутствует</td>
+                <td th:text="${cargo.departureCity}">Город отправки отсутствует</td>
+                <td th:text="${#temporals.format(cargo.departureDateTime, 'dd.MM.yyyy HH:mm')}">Дата отправки отсутствует</td>
+                <td th:text="${cargo.arrivalCity}">Город прибытия отсутствует</td>
+                <td th:text="${#temporals.format(cargo.arrivalDateTime, 'dd.MM.yyyy HH:mm')}">Дата прибытия отсутствует</td>
+                <td>
+                    <div class="d-flex justify-content-center">
+                        <!-- Редактировать и удалить рейс доступны только для админа -->
+                        <button type="button" class="btn btn-custom w-100 me-2 rounded-button" data-bs-toggle="modal" data-bs-target="#editCargoModal"
+                                th:if="${user != null and user.role == 'ADMIN'}"
+                                th:onclick="'openEditModal(' + ${cargo.id} + ')'">
+                            <i class="fas fa-edit"></i> Редактировать
+                        </button>
+
+                        <form th:action="@{/delete/{id}(id=${cargo.id})}" method="post" class="d-inline" th:if="${user != null and user.role == 'ADMIN'}">
+                            <button class="btn btn-custom w-100 rounded-button" type="submit">
+                                <i class="fas fa-trash"></i> Удалить
+                            </button>
+                        </form>
+
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <!-- Кнопка для добавления рейса -->
+    <button type="button" class="btn btn-custom mt-3" data-bs-toggle="modal" data-bs-target="#addCargoModal"
+            th:if="${user != null and user.role == 'ADMIN'}">
+        Добавить рейс
+    </button>
+</div>
+
+
+
+<!-- Модальное окно для логина -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 15px; overflow: hidden;">
+            <div class="modal-header" style="background-color: #7A5C9D; color: white; padding: 15px;">
+                <h5 class="modal-title mx-auto" id="loginModalLabel">Вход</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="position: absolute; right: 15px; background-color: white;"></button>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <form th:action="@{/login}" method="post">
+                    <div class="mb-3">
+                        <label for="username" class="form-label" style="font-weight: 600; color: #7A5C9D;">Имя пользователя</label>
+                        <input type="text" class="form-control" id="username" name="username" required style="border-radius: 5px; font-size: 14px; padding: 10px;"/>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label" style="font-weight: 600; color: #7A5C9D;">Пароль</label>
+                        <input type="password" class="form-control" id="password" name="password" required style="border-radius: 5px; font-size: 14px; padding: 10px;"/>
+                    </div>
+                    <button type="submit" class="btn btn-custom w-100" style="font-size: 16px; padding: 12px; border-radius: 30px; background-color: #c72c41; color: white;">
+                        Войти
+                    </button>
+                </form>
+            </div>
+            <div class="modal-footer" style="background-color: #f8f3ef;">
+                <p class="text-center w-100" style="font-size: 0.9em; color: #555;">Еще нет аккаунта? <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal" style="color: #7A5C9D;">Зарегистрируйтесь</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Модальное окно для регистрации -->
+<div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 15px; overflow: hidden;">
+            <div class="modal-header" style="background-color: #7A5C9D; color: white; padding: 15px;">
+                <h5 class="modal-title mx-auto" id="registerModalLabel">Регистрация</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="position: absolute; right: 15px; background-color: white;"></button>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <form th:action="@{/register}" method="post">
+                    <div class="mb-3">
+                        <label for="regUsername" class="form-label" style="font-weight: 600; color: #7A5C9D;">Имя пользователя</label>
+                        <input type="text" class="form-control" id="regUsername" name="username" required style="border-radius: 5px; font-size: 14px; padding: 10px;"/>
+                    </div>
+                    <div class="mb-3">
+                        <label for="regEmail" class="form-label" style="font-weight: 600; color: #7A5C9D;">Электронная почта</label>
+                        <input type="email" class="form-control" id="regEmail" name="email" required style="border-radius: 5px; font-size: 14px; padding: 10px;"/>
+                    </div>
+                    <div class="mb-3">
+                        <label for="regPassword" class="form-label" style="font-weight: 600; color: #7A5C9D;">Пароль</label>
+                        <input type="password" class="form-control" id="regPassword" name="password" required style="border-radius: 5px; font-size: 14px; padding: 10px;"/>
+                    </div>
+                    <button type="submit" class="btn btn-custom w-100" style="font-size: 16px; padding: 12px; border-radius: 30px; background-color: #c72c41; color: white;">
+                        Зарегистрироваться
+                    </button>
+                </form>
+            </div>
+            <div class="modal-footer" style="background-color: #f8f3ef;">
+                <p class="text-center w-100" style="font-size: 0.9em; color: #555;">Уже есть аккаунт? <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal" style="color: #7A5C9D;">Войдите</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const loginModalElement = document.getElementById('loginModal');
+        const registerModalElement = document.getElementById('registerModal');
+
+        // Логика для модального окна логина
+        if (loginModalElement) {
+            loginModalElement.addEventListener('show.bs.modal', function () {
+                const modalBody = loginModalElement.querySelector('.modal-body');
+                modalBody.innerHTML = 'Загрузка...';
+                fetch('/login')
+                    .then(response => response.text())
+                    .then(data => {
+                        modalBody.innerHTML = data;
+                    })
+                    .catch(error => {
+                        modalBody.innerHTML = '<p class="text-danger">Ошибка загрузки формы.</p>';
+                    });
+            });
+        }
+
+        // Логика для модального окна регистрации
+        if (registerModalElement) {
+            registerModalElement.addEventListener('show.bs.modal', function () {
+                const modalBody = registerModalElement.querySelector('.modal-body');
+                modalBody.innerHTML = 'Загрузка...';
+                fetch('/register')
+                    .then(response => response.text())
+                    .then(data => {
+                        modalBody.innerHTML = data;
+                    })
+                    .catch(error => {
+                        modalBody.innerHTML = '<p class="text-danger">Ошибка загрузки формы.</p>';
+                    });
+            });
+        }
+    });
+</script>
+<!-- Модальное окно для добавления груза -->
+<div class="modal fade" id="addCargoModal" tabindex="-1" aria-labelledby="addCargoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 15px; overflow: hidden;">
+            <div class="modal-header" style="background-color: #7A5C9D; color: white;">
+                <h5 class="modal-title" id="addCargoModalLabel">Добавить рейс</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <form id="addCargoForm" method="post" action="/save">
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/> <!-- CSRF Token -->
+
+                    <div class="mb-3">
+                        <label for="cargoName" class="form-label" style="font-weight: 600; color: #7A5C9D;">Название рейса</label>
+                        <input type="text" class="form-control" id="cargoName" name="cargoName" placeholder="Введите название рейса" required
+                               style="border-radius: 5px; font-size: 14px; padding: 10px;"/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="cargoContent" class="form-label" style="font-weight: 600; color: #7A5C9D;">Название самолёта</label>
+                        <input type="text" class="form-control" id="cargoContent" name="cargoContent" placeholder="Введите название самолёта" required
+                                  style="border-radius: 5px; font-size: 14px; padding: 10px;"></input>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="departureCity" class="form-label" style="font-weight: 600; color: #7A5C9D;">Город отправки</label>
+                        <input type="text" class="form-control" id="departureCity" name="departureCity" placeholder="Введите город отправки" required
+                               style="border-radius: 5px; font-size: 14px; padding: 10px;"/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="departureDateTime" class="form-label" style="font-weight: 600; color: #7A5C9D;">Дата отправки</label>
+                        <input type="datetime-local" class="form-control" id="departureDateTime" name="departureDateTime" required
+                               style="border-radius: 5px; font-size: 14px; padding: 10px;"/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="arrivalCity" class="form-label" style="font-weight: 600; color: #7A5C9D;">Город прибытия</label>
+                        <input type="text" class="form-control" id="arrivalCity" name="arrivalCity" placeholder="Введите город прибытия" required
+                               style="border-radius: 5px; font-size: 14px; padding: 10px;"/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="arrivalDateTime" class="form-label" style="font-weight: 600; color: #7A5C9D;">Дата прибытия</label>
+                        <input type="datetime-local" class="form-control" id="arrivalDateTime" name="arrivalDateTime" required
+                               style="border-radius: 5px; font-size: 14px; padding: 10px;"/>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer" style="background-color: #f8f3ef;">
+                <button type="button" class="btn btn-custom" data-bs-dismiss="modal" style="background-color: #f0f0f0; color: #555; border-radius: 30px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); transition: all 0.3s ease-in-out;"
+                        onmouseover="this.style.boxShadow='0 6px 12px rgba(0, 0, 0, 0.3)'; this.style.transform='scale(1.05)';"
+                        onmouseout="this.style.boxShadow='0 4px 6px rgba(0, 0, 0, 0.2)'; this.style.transform='scale(1)';">Закрыть</button>
+                <button type="button" class="btn btn-custom" onclick="addCargo()" style="background-color: #5c4b8c; color: white; border-radius: 30px; transition: all 0.3s ease-in-out;"
+                        onmouseover="this.style.backgroundColor='#4a3a6a'; this.style.transform='scale(1.05)';"
+                        onmouseout="this.style.backgroundColor='#5c4b8c'; this.style.transform='scale(1)';">Сохранить новый рейс</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Модальное окно для редактирования груза -->
+<div class="modal fade" id="editCargoModal" tabindex="-1" aria-labelledby="editCargoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCargoModalLabel">Редактировать груз</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editCargoForm">
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/> <!-- CSRF Token -->
+                    <input type="hidden" id="editCargoId" name="id">
+                    <div class="mb-3">
+                        <label for="editCargoName" class="form-label">Название рейса</label>
+                        <input type="text" class="form-control" id="editCargoName" name="cargoName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editCargoContent" class="form-label">Название самолёта</label>
+                        <input type="text" class="form-control" id="editCargoContent" name="cargoContent" required></input>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDepartureCity" class="form-label">Город отправки</label>
+                        <input type="text" class="form-control" id="editDepartureCity" name="departureCity" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDepartureDateTime" class="form-label">Дата отправки</label>
+                        <input type="datetime-local" class="form-control" id="editDepartureDateTime" name="departureDateTime" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editArrivalCity" class="form-label">Город прибытия</label>
+                        <input type="text" class="form-control" id="editArrivalCity" name="arrivalCity" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editArrivalDateTime" class="form-label">Дата прибытия</label>
+                        <input type="datetime-local" class="form-control" id="editArrivalDateTime" name="arrivalDateTime" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                <button type="button" class="btn btn-primary" onclick="updateCargo()">Сохранить изменения</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<footer>
+    <p>&copy; 2024 Поиск авиабилетов. Все права защищены.</p>
+</footer>
+
+<script type="text/javascript">
+    function clearSearch() {
+        window.location = "[[@{/}]]";
+    }
+
+    function filterCargoByDate() {
+        const selectedDate = document.getElementById('dateFilter').value;
+        const rows = document.querySelectorAll('#cargoTable tr');
+
+        rows.forEach(row => {
+            const dateTimeCell = row.cells[4].innerText; // Ячейка с датой отправки
+            const datePart = dateTimeCell.split(' ')[0]; // Берем только часть с датой
+            const [day, month, year] = datePart.split('.'); // Преобразуем формат dd.MM.yyyy в yyyy-MM-dd
+            const formattedDate = `${year}-${month}-${day}`; // Приводим дату к формату yyyy-MM-dd
+
+            if (formattedDate) {
+                const isMatch = formattedDate === selectedDate;
+                row.style.display = isMatch ? '' : 'none'; // Показываем или скрываем строку
+            }
+        });
+
+        updateCargoCount();
+    }
+
+    function updateCargoCount() {
+        const visibleRows = [...document.querySelectorAll('#cargoTable tr')]
+            .filter(row => row.style.display !== 'none').length;
+        document.getElementById('CargoCount').innerText = visibleRows;
+    }
+
+    function addCargo() {
+        const cargo = {
+            cargoName: document.getElementById('cargoName').value,
+            cargoContent: document.getElementById('cargoContent').value,
+            departureCity: document.getElementById('departureCity').value,
+            departureDateTime: document.getElementById('departureDateTime').value,
+            arrivalCity: document.getElementById('arrivalCity').value,
+            arrivalDateTime: document.getElementById('arrivalDateTime').value
+        };
+
+        fetch('/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(cargo)
+        })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('Ошибка при добавлении груза');
+                }
+            });
+
+        let addCargoModal = new bootstrap.Modal(document.getElementById('addCargoModal'));
+        addCargoModal.hide();
+    }
+
+    function updateCargo() {
+        const cargo = {
+            id: document.getElementById('editCargoId').value,
+            cargoName: document.getElementById('editCargoName').value,
+            cargoContent: document.getElementById('editCargoContent').value,
+            departureCity: document.getElementById('editDepartureCity').value,
+            departureDateTime: document.getElementById('editDepartureDateTime').value,
+            arrivalCity: document.getElementById('editArrivalCity').value,
+            arrivalDateTime: document.getElementById('editArrivalDateTime').value
+        };
+
+        fetch('/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(cargo)
+        })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('Ошибка при обновлении груза');
+                }
+            });
+
+        let editCargoModal = new bootstrap.Modal(document.getElementById('editCargoModal'));
+        editCargoModal.hide();
+    }
+    function openEditModal(id) {
+        fetch(`/edit/${id}`)
+            .then(response => response.json())
+            .then(cargo => {
+                document.getElementById('editCargoId').value = cargo.id;
+                document.getElementById('editCargoName').value = cargo.cargoName;
+                document.getElementById('editCargoContent').value = cargo.cargoContent;
+                document.getElementById('editDepartureCity').value = cargo.departureCity;
+                document.getElementById('editDepartureDateTime').value = cargo.departureDateTime;
+                document.getElementById('editArrivalCity').value = cargo.arrivalCity;
+                document.getElementById('editArrivalDateTime').value = cargo.arrivalDateTime;
+            })
+            .catch(error => console.error('Ошибка:', error));
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

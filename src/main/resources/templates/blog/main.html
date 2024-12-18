@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>-----</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif; /* Новый шрифт */
+            background-color: #E6D7FF; /* Светло-фиолетовый фон */
+            color: #4B0082; /* Темно-фиолетовый текст для контраста */
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        header {
+            padding: 20px 20px; /* Уменьшение отступов */
+            text-align: center;
+            background: #5C4B8C; /* Светло-фиолетовый фон для заголовка */
+            color: #ffffff; /* Белый цвет текста */
+            font-family: 'Roboto', sans-serif; /* Шрифт Roboto */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 100;
+            margin-top: 0;
+        }
+
+
+        header h1 {
+            font-family: 'Roboto', sans-serif; /* Шрифт Roboto */
+            font-size: 3rem; /* Размер шрифта */
+            margin-bottom: 10px;
+            margin-top: 0;
+            color: #ffffff; /* Белый цвет текста для контраста */
+        }
+
+        .card-container {
+            width: 100%; /* Ширина 100%, но карточка будет центрирована */
+            display: flex;
+            justify-content: center; /* Центрируем контейнер по горизонтали */
+            align-items: center; /* Центрируем контейнер по вертикали */
+            padding: 20px; /* Добавим немного отступов вокруг */
+        }
+
+        header p {
+            font-family: 'Roboto', sans-serif; /* Шрифт Roboto */
+            font-size: 1.2rem; /* Размер шрифта */
+            margin-bottom: 1.5rem; /* Отступ снизу */
+            margin-top: 0; /* Отсутствие отступа сверху */
+            color: #ffffff; /* Белый цвет текста для контраста */
+        }
+
+
+        .card {
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff; /* Белый фон для карточек */
+            border: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 15px; /* Скругленные углы */
+        }
+
+        .card:hover {
+            transform: translateY(-5px); /* Легкое поднимание карточки при наведении */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); /* Тень для выделения */
+        }
+
+
+        footer {
+            background-color: #5C4B8C; /* Светло-фиолетовый фон для подвала */
+            color: white; /* Белый текст для контраста */
+            padding: 20px 0;
+            text-align: center;
+            width: 100%;
+            position: relative;
+            z-index: 100;
+            font-family: 'Roboto', sans-serif; /* Шрифт Roboto */
+        }
+
+
+        .table th {
+            background-color: #5C4B8C; /* Светло-фиолетовый фон для заголовков таблицы */
+            color: #fff; /* Белый цвет текста */
+        }
+
+        .table td {
+            background-color: #ffffff; /* Белый фон для ячеек таблицы */
+            color: #333; /* Темный текст для контраста */
+        }
+
+        .btn-primary {
+            background-color: #5C4B8C; /* Светло-фиолетовый цвет для кнопки */
+            border: none;
+            color: white; /* Белый текст на кнопке */
+        }
+
+        .btn-primary:hover {
+            background-color: #7A5C9D; /* Более светлый фиолетовый при наведении */
+        }
+
+        .btn-primary:active {
+            transform: none; /* Убираем эффект уменьшения при нажатии */
+        }
+
+
+        .modal-header, .modal-body {
+            background-color: #ffffff; /* Белый фон */
+            color: #333; /* Темный текст для хорошей читаемости */
+            font-family: 'Roboto', sans-serif; /* Шрифт Roboto для согласованности */
+        }
+
+        .modal-footer {
+            background-color: #E6D7FF; /* Светло-фиолетовый фон для подвала модального окна */
+            color: #333; /* Темный текст для контраста */
+        }
+
+
+        .rounded-button {
+            border-radius: 30px; /* Скругленные углы кнопки */
+            padding: 10px 20px; /* Отступы внутри кнопки */
+            background-color: #5C4B8C; /* Светло-фиолетовый фон для кнопки */
+            color: white; /* Белый текст на кнопке */
+            border: none; /* Без рамки */
+            font-family: 'Roboto', sans-serif; /* Шрифт Roboto */
+            transition: background-color 0.3s ease; /* Плавный переход для изменения цвета */
+        }
+
+        .rounded-button:hover {
+            background-color: #7A5C9D; /* Светлый фиолетовый при наведении */
+        }
+
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            color: #5C4B8C; /* Цвет текста для заголовков секций */
+            font-family: 'Roboto', sans-serif; /* Шрифт Roboto */
+        }
+
+        .chart-container {
+            margin: 40px 0;
+        }
+
+
+        /* Общий контейнер для меню и навигационного бара */
+        .header-nav-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 0;
+            background-color: #5C4B8C; /* Светло-фиолетовый фон для контейнера */
+            padding: 10px 0; /* Немного отступов сверху и снизу */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Легкая тень для выделения */
+        }
+
+
+        /* Навигационное меню */
+        /* Навигационное меню */
+        .nav {
+            background-color: #5C4B8C; /* Светло-фиолетовый фон для меню */
+            color: #fff; /* Белый цвет текста */
+            padding: 5px 0; /* Уменьшение отступов */
+            display: flex;
+            justify-content: center; /* Центрирование ссылок */
+            gap: 30px; /* Расстояние между ссылками */
+            z-index: 1000; /* Поверх других элементов */
+            border-bottom: none;
+        }
+
+        /* Ссылки в навигации */
+        .nav-link {
+            color: #fff;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            transition: color 0.3s ease; /* Плавный переход для изменения цвета */
+        }
+
+        .nav-link:hover {
+            color: #9381C6; /* Цвет ссылки при наведении */
+        }
+
+        .nav-link.active {
+            color: #ffffff !important; /* Белый цвет для активной ссылки */
+            font-weight: bold;
+        }
+
+
+        /* Верхний навигационный бар */
+        .auth-bar {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 1100; /* Слой выше меню */
+            border: none;
+            font-family: 'Roboto', sans-serif; /* Шрифт Roboto для согласованности */
+        }
+
+        .auth-buttons {
+            display: flex;
+            flex-direction: row; /* Кнопки в ряд */
+            gap: 15px; /* Расстояние между кнопками */
+        }
+
+        /* Кнопки входа и регистрации */
+        .auth-button {
+            background-color: #5C4B8C; /* Светло-фиолетовый фон для кнопок */
+            color: white; /* Белый текст */
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px; /* Скругленные углы */
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease; /* Плавный переход для изменения цвета */
+        }
+
+        .auth-button:hover {
+            background-color: #7A5C9D; /* Светлый фиолетовый при наведении */
+        }
+
+        .auth-button:active {
+            background-color: #4B3F68; /* Темный фиолетовый при нажатии */
+        }
+
+
+        /* Кнопки входа и регистрации */
+        .btn-primary {
+            background-color: #5C4B8C; /* Светло-фиолетовый цвет фона */
+            border: none;
+            padding: 8px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            color: white; /* Белый текст на кнопке */
+            transition: background-color 0.3s ease, color 0.3s ease; /* Плавный переход для изменения цвета фона и текста */
+        }
+
+        .btn-primary:hover {
+            background-color: #7A5C9D; /* Светлый фиолетовый при наведении */
+            color: #9381C6; /* Цвет текста при наведении */
+        }
+
+        .btn-primary:active {
+            transform: none; /* Убираем эффект уменьшения при нажатии */
+            color: #ffffff; /* Белый текст при нажатии */
+        }
+
+
+        /* Стили для имени пользователя */
+        .username {
+            color: #9381C6; /* Светлый фиолетовый цвет текста */
+            font-size: 18px; /* Увеличиваем размер шрифта */
+            font-weight: 600; /* Сохраняем жирное начертание */
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4); /* Меньше размытие тени, для мягкости */
+            transition: color 0.3s ease, text-shadow 0.3s ease; /* Плавный переход для цвета текста и тени */
+        }
+
+        .username:hover {
+            color: #7A5C9D; /* Изменяем цвет на светлый фиолетовый при наведении */
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6); /* Усиливаем тень при наведении */
+        }
+
+
+        /* Стили для кнопки выхода */
+        .btn-danger {
+            background-color: #5C4B8C; /* Светло-фиолетовый для кнопки выхода */
+            border: none;
+            padding: 5px 15px;
+            font-size: 14px;
+            border-radius: 5px;
+            color: white; /* Белый текст на кнопке */
+            transition: background-color 0.3s ease; /* Плавный переход для изменения цвета фона */
+        }
+
+        .btn-danger:hover {
+            background-color: #7A5C9D; /* Светлый фиолетовый при наведении */
+        }
+        .btn-custom {
+            background-color: #5C4B8C; /* Светло-фиолетовый для кнопки */
+            color: white;
+            width: 100%; /* Полная ширина кнопки */
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            transition: background-color 0.3s ease; /* Плавный переход для изменения цвета фона */
+        }
+
+        .btn-custom:hover {
+            background-color: #7A5C9D; /* Светлый фиолетовый при наведении */
+        }
+
+        .modal-header {
+            background-color: #5C4B8C; /* Светло-фиолетовый цвет фона */
+            color: white;
+            display: flex;
+            justify-content: center; /* Центрирование содержимого по горизонтали */
+            position: relative;
+        }
+
+        .modal-header .btn-close {
+            position: absolute;
+            right: 1rem; /* Размещение кнопки закрытия справа */
+            filter: invert(100%); /* Делает иконку белой */
+            background-color: rgba(255, 255, 255, 0.3); /* Белый фон с прозрачностью */
+            border: 1px solid white; /* Белая рамка для видимости */
+            border-radius: 50%; /* Круглая форма кнопки */
+            transition: background-color 0.3s ease; /* Плавный переход для изменения фона */
+        }
+
+        .modal-header .btn-close:hover {
+            background-color: rgba(255, 255, 255, 0.6); /* Слегка затемненный фон при наведении */
+        }
+
+        .popular-courses-title {
+            font-family: "Times New Roman", Times, serif;
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #5C4B8C; /* Светло-фиолетовый цвет для заголовка */
+            border-bottom: 3px solid #7A5C9D; /* Нижняя граница в более светлый фиолетовый цвет */
+            display: inline-block;
+            padding-bottom: 5px;
+            transition: border-color 0.3s ease; /* Плавный переход для цвета границы */
+        }
+
+        .popular-courses-title:hover {
+            border-bottom-color: #5C4B8C; /* Темно-фиолетовая граница при наведении */
+        }
+
+        /* Для анимации */
+        .fade-in {
+            animation: fadeIn 2s ease-out; /* Плавная анимация появления */
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0; /* Начальная прозрачность */
+                transform: translateY(20px); /* Смещение по оси Y */
+                color: #5C4B8C; /* Светло-фиолетовый цвет на старте */
+            }
+            100% {
+                opacity: 1; /* Окончательная непрозрачность */
+                transform: translateY(0); /* Элемент приходит в исходное положение */
+                color: #111; /* Темный цвет текста по завершению */
+            }
+        }
+
+
+        /* Для изображений */
+        .img-fluid {
+            border-radius: 10px; /* Скругленные углы для плавного вида */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Легкая тень для объемности */
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Плавный переход для увеличения и тени */
+        }
+
+        .img-fluid:hover {
+            transform: scale(1.05); /* Легкое увеличение изображения при наведении */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); /* Увеличенная тень при наведении */
+        }
+
+        .carousel-item img {
+            max-height: 400px; /* Максимальная высота изображения */
+            object-fit: cover; /* Заполнение изображения, сохраняя пропорции */
+            border-radius: 10px; /* Скругленные углы для плавного вида */
+        }
+
+
+        /* Новый стиль для секций с креативными изображениями */
+        .feature-section {
+            background-color: #ffffff; /* Белый фон для секции */
+            padding: 50px 20px;
+            margin-top: 50px;
+            border-radius: 15px; /* Скругленные углы */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* Легкая тень */
+        }
+
+        .feature-section h2 {
+            font-size: 2.5rem; /* Размер шрифта для заголовка */
+            color: #5C4B8C; /* Светло-фиолетовый цвет текста */
+            text-align: center; /* Центрирование текста */
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .feature-section p {
+            font-size: 1.2rem; /* Размер шрифта для текста */
+            color: #555; /* Темно-серый текст */
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .feature-section .row {
+            display: flex;
+            justify-content: space-around; /* Расположение элементов по горизонтали */
+        }
+
+        .feature-item {
+            text-align: center; /* Центрирование содержимого */
+            max-width: 300px;
+            margin: 0 10px;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease; /* Плавный переход для увеличения и тени */
+        }
+
+        .feature-item img {
+            width: 100%; /* Ширина изображения 100% от родительского контейнера */
+            height: 200px; /* Фиксированная высота изображения */
+            object-fit: cover; /* Сохранение пропорций изображения */
+            border-radius: 10px; /* Скругленные углы изображения */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Легкая тень */
+        }
+
+        .feature-item h4 {
+            font-size: 1.5rem; /* Размер шрифта для заголовка */
+            color: #5C4B8C; /* Светло-фиолетовый цвет текста */
+            margin-top: 15px;
+        }
+
+        .feature-item p {
+            font-size: 1rem;
+            color: #777; /* Серый цвет для текста */
+            margin-top: 10px;
+        }
+
+        .feature-item:hover {
+            transform: scale(1.05); /* Легкое увеличение при наведении */
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); /* Усиленная тень */
+        }
+
+        .feature-item:hover h4 {
+            color: #7A5C9D; /* Цвет заголовка при наведении */
+        }
+
+        .feature-item:hover p {
+            color: #555; /* Более темный цвет для текста при наведении */
+        }
+
+
+        /* Дополнительные стили для кнопок */
+        .btn-cta {
+            background-color: #5C4B8C; /* Светло-фиолетовый цвет фона */
+            color: #fff; /* Белый цвет текста */
+            padding: 15px 30px; /* Отступы для кнопки */
+            font-size: 1.2rem; /* Размер шрифта */
+            font-weight: 600; /* Жирное начертание */
+            text-decoration: none; /* Без подчеркивания */
+            border-radius: 30px; /* Скругленные углы */
+            display: inline-block; /* Для работы с отступами */
+            margin-top: 30px; /* Отступ сверху */
+            transition: background-color 0.3s ease, transform 0.3s ease; /* Плавный переход для фона и масштаба */
+        }
+
+        .btn-cta:hover {
+            background-color: #7A5C9D; /* Светлый фиолетовый при наведении */
+            transform: scale(1.05); /* Увеличение при наведении */
+        }
+
+        .btn-cta:active {
+            transform: scale(1); /* Убираем эффект увеличения при нажатии */
+        }
+
+
+        /* Стили для карусели */
+        .carousel {
+            margin-top: 50px; /* Отступ сверху */
+        }
+
+        .carousel-item {
+            position: relative; /* Позиционирование для вложенных элементов */
+        }
+
+        .carousel-caption {
+            position: absolute;
+            top: 50%; /* Центрирование по вертикали */
+            left: 50%; /* Центрирование по горизонтали */
+            transform: translate(-50%, -50%); /* Совмещение с центром */
+            background-color: rgba(0, 0, 0, 0.5); /* Прозрачный черный фон для текста */
+            color: #fff; /* Белый цвет для текста */
+            padding: 10px 20px; /* Отступы для текста */
+            border-radius: 5px; /* Скругленные углы */
+            font-size: 1.2rem; /* Размер шрифта для заголовка */
+            text-align: center; /* Центрирование текста */
+            transition: transform 0.3s ease-in-out; /* Плавный переход для изменения трансформации */
+        }
+
+        .carousel-caption:hover {
+            transform: translate(-50%, -50%) scale(1.1); /* Легкое увеличение при наведении */
+        }
+
+        .carousel-item img {
+            width: 100%; /* Ширина изображения на 100% */
+            object-fit: cover; /* Обеспечивает, чтобы изображение не теряло свою форму */
+            height: 100%; /* Подгонка по высоте */
+            border-radius: 15px; /* Скругленные углы для изображений */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Легкая тень для изображения */
+        }
+
+        .posts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        .post-card {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .post-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .post-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .post-date {
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .post-author {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .post-content {
+            font-size: 1rem;
+            color: #444;
+            line-height: 1.6;
+        }
+
+
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-nav-container">
+        <!-- Навигационное меню -->
+        <nav class="nav">
+            <a class="nav-link" href="/">Главная страница</a>
+            <a class="nav-link" href="/blog">Автоблог</a> <!-- Ссылка на главную страницу блога -->
+            <a class="nav-link" href="/blog/admin">Управление блогом</a> <!-- Ссылка на административную панель -->
+        </nav>
+
+
+        <!-- Верхний навигационный бар -->
+        <div class="auth-bar">
+            <!-- Проверка авторизации пользователя -->
+            <div th:if="${user == null}">
+                <!-- Кнопки входа и регистрации -->
+                <div class="auth-buttons">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loginModal">
+                        Вход
+                    </button>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal">
+                        Регистрация
+                    </button>
+                </div>
+            </div>
+
+            <div th:if="${user != null}" class="user-info">
+                <!-- Ссылка на профиль пользователя с применением стиля nav-link -->
+                <a th:href="@{/profile/{id}(id=${user.id})}" th:text="${user.username}" class="nav-link"></a>
+                <!-- Кнопка выхода -->
+                <a href="/logout" class="btn btn-danger">Выйти</a>
+            </div>
+        </div>
+    </div>
+    <h1>Перевозки грузов</h1>
+    <p>Управляйте грузами легко и эффективно</p>
+</header>
+
+<div class="search-bar mb-4">
+    <h4>Поиск записей</h4>
+    <form action="/blog/search" method="get" class="d-flex gap-2">
+        <input type="text" name="query" class="form-control" placeholder="Введите запрос" required>
+        <select name="criteria" class="form-select">
+            <option value="date">Поиск по дате записи</option>
+            <option value="title">Поиск по названию</option>
+            <option value="dateAndTitle">Поиск по дате и названию</option>
+            <option value="content">Поиск по тексту записи</option>
+            <option value="dateAndContent">Поиск по дате и тексту записи</option>
+            <option value="all">Поиск по всем критериям сразу</option>
+        </select>
+        <button type="submit" class="btn btn-primary">Искать</button>
+    </form>
+</div>
+
+<h1>Главная страница блога</h1>
+<div class="posts-container">
+    <th:block th:each="post : ${posts}">
+        <div class="post-card">
+            <h2 class="post-title" th:text="${post.title}">Название</h2>
+            <p class="post-date" th:text="${#temporals.format(post.createdAt, 'dd.MM.yyyy HH:mm')}">Дата отсутствует</p>
+            <p class="post-author" th:text="${post.author}">Автор</p>
+            <p class="post-content" th:text="${post.content}">Текст</p>
+        </div>
+    </th:block>
+</div>
+
+
+<!-- Модальное окно для логина -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 15px; overflow: hidden;">
+            <div class="modal-header" style="background-color: #c72c41; color: white; padding: 15px;">
+                <h5 class="modal-title mx-auto" id="loginModalLabel">Вход</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="position: absolute; right: 15px; background-color: white;"></button>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <form th:action="@{/login}" method="post">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Имя пользователя</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Пароль</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Войти</button>
+                </form>
+            </div>
+            <div class="modal-footer" style="background-color: #f8f3ef;">
+                <p class="text-center w-100" style="font-size: 0.9em; color: #555;">Еще нет аккаунта? <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal">Зарегистрируйтесь</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для регистрации -->
+<div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 15px; overflow: hidden;">
+            <div class="modal-header" style="background-color: #c72c41; color: white; padding: 15px;">
+                <h5 class="modal-title mx-auto" id="registerModalLabel">Регистрация</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="position: absolute; right: 15px; background-color: white;"></button>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <form th:action="@{/register}" method="post">
+                    <div class="mb-3">
+                        <label for="regUsername" class="form-label">Имя пользователя</label>
+                        <input type="text" class="form-control" id="regUsername" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="regEmail" class="form-label">Электронная почта</label>
+                        <input type="email" class="form-control" id="regEmail" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="regPassword" class="form-label">Пароль</label>
+                        <input type="password" class="form-control" id="regPassword" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Зарегистрироваться</button>
+                </form>
+            </div>
+            <div class="modal-footer" style="background-color: #f8f3ef;">
+                <p class="text-center w-100" style="font-size: 0.9em; color: #555;">Уже есть аккаунт? <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Войдите</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const loginModalElement = document.getElementById('loginModal');
+        const registerModalElement = document.getElementById('registerModal');
+
+        // Логика для модального окна логина
+        if (loginModalElement) {
+            loginModalElement.addEventListener('show.bs.modal', function () {
+                const modalBody = loginModalElement.querySelector('.modal-body');
+                modalBody.innerHTML = 'Загрузка...';
+                fetch('/login')
+                    .then(response => response.text())
+                    .then(data => {
+                        modalBody.innerHTML = data;
+                    })
+                    .catch(error => {
+                        modalBody.innerHTML = '<p class="text-danger">Ошибка загрузки формы.</p>';
+                    });
+            });
+        }
+
+        // Логика для модального окна регистрации
+        if (registerModalElement) {
+            registerModalElement.addEventListener('show.bs.modal', function () {
+                const modalBody = registerModalElement.querySelector('.modal-body');
+                modalBody.innerHTML = 'Загрузка...';
+                fetch('/register')
+                    .then(response => response.text())
+                    .then(data => {
+                        modalBody.innerHTML = data;
+                    })
+                    .catch(error => {
+                        modalBody.innerHTML = '<p class="text-danger">Ошибка загрузки формы.</p>';
+                    });
+            });
+        }
+    });
+</script>
+<footer>
+    <p>&copy; 2024 Перевозки грузов. Все права защищены.</p>
+</footer>
+<script type="text/javascript">
+    function clearSearch() {
+        window.location = "[[@{/}]]";
+    }
+
+
+    function updateCargoCount() {
+        const visibleRows = [...document.querySelectorAll('#cargoTable tr')]
+            .filter(row => row.style.display !== 'none').length;
+        document.getElementById('CargoCount').innerText = visibleRows;
+    }
+
+    function addCargo() {
+        const cargo = {
+            cargoName: document.getElementById('cargoName').value,
+            cargoContent: document.getElementById('cargoContent').value,
+            departureCity: document.getElementById('departureCity').value,
+            departureDateTime: document.getElementById('departureDateTime').value,
+            arrivalCity: document.getElementById('arrivalCity').value,
+            arrivalDateTime: document.getElementById('arrivalDateTime').value
+        };
+
+        fetch('/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(cargo)
+        })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('Ошибка при добавлении груза');
+                }
+            });
+
+        let addCargoModal = new bootstrap.Modal(document.getElementById('addCargoModal'));
+        addCargoModal.hide();
+    }
+
+    function updateCargo() {
+        const cargo = {
+            id: document.getElementById('editCargoId').value,
+            cargoName: document.getElementById('editCargoName').value,
+            cargoContent: document.getElementById('editCargoContent').value,
+            departureCity: document.getElementById('editDepartureCity').value,
+            departureDateTime: document.getElementById('editDepartureDateTime').value,
+            arrivalCity: document.getElementById('editArrivalCity').value,
+            arrivalDateTime: document.getElementById('editArrivalDateTime').value
+        };
+
+        fetch('/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(cargo)
+        })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert('Ошибка при обновлении груза');
+                }
+            });
+
+        let editCargoModal = new bootstrap.Modal(document.getElementById('editCargoModal'));
+        editCargoModal.hide();
+    }
+    function openEditModal(id) {
+        fetch(`/edit/${id}`)
+            .then(response => response.json())
+            .then(cargo => {
+                document.getElementById('editCargoId').value = cargo.id;
+                document.getElementById('editCargoName').value = cargo.cargoName;
+                document.getElementById('editCargoContent').value = cargo.cargoContent;
+                document.getElementById('editDepartureCity').value = cargo.departureCity;
+                document.getElementById('editDepartureDateTime').value = cargo.departureDateTime;
+                document.getElementById('editArrivalCity').value = cargo.arrivalCity;
+                document.getElementById('editArrivalDateTime').value = cargo.arrivalDateTime;
+            })
+            .catch(error => console.error('Ошибка:', error));
+    }
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
